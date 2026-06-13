@@ -1,0 +1,14 @@
+target/
+*.class
+*.log
+*.mdmp
+replay_pid*.log
+hs_err_pid*.log
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+dependency-reduced-pom.xml
+META-INF/

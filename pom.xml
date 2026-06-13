@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>me.legendcraft</groupId>
+    <artifactId>AntiSeedCracker</artifactId>
+    <version>3.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>AntiSeedCracker</name>
+    <description>Professional multi-layer world seed protection plugin for Paper, Purpur, Folia, and Spigot 26.1.2+</description>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-releases/</url>
+        </repository>
+        <repository>
+            <id>spigotmc-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>dev.folia</groupId>
+            <artifactId>folia-api</artifactId>
+            <version>26.1.2.build.8-stable</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.retrooper</groupId>
+            <artifactId>packetevents-spigot</artifactId>
+            <version>2.12.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.3.1-jre</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.20-R0.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>25</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.2</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>false</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.github.retrooper.packetevents</pattern>
+                            <shadedPattern>me.legendcraft.antiseedcracker.lib.packetevents</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.github.retrooper.packetevents</pattern>
+                            <shadedPattern>me.legendcraft.antiseedcracker.lib.packetevents.impl</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                    </transformers>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                <exclude>**/module-info.class</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>net.kyori:adventure-api</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>net.kyori:adventure-key</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>net.kyori:adventure-nbt</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>net.kyori:examination-api</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>net.kyori:examination-string</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.jetbrains:annotations</artifact>
+                            <excludes><exclude>**</exclude></excludes>
+                        </filter>
+                        <filter>
+                            <artifact>com.github.retrooper:packetevents-spigot</artifact>
+                            <excludes>
+                                <exclude>plugin.yml</exclude>
+                                <exclude>META-INF/maven/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

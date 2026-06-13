@@ -1,0 +1,42 @@
+name: Feature Request
+description: Suggest a new protection layer, configuration option, or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, check whether a similar request already exists.
+
+  - type: textarea
+    id: bypass-vector
+    attributes:
+      label: What seed-leaking method or attack vector would this address?
+      description: Describe the bypass technique, exploit, or gap in current protection.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should AntiSeedCracker handle it? Be as specific as possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Any other approaches you thought of, and why you prefer the one above.
+
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Affected platforms
+      multiple: true
+      options:
+        - Paper
+        - Purpur
+        - Folia
+        - Spigot
+        - All platforms

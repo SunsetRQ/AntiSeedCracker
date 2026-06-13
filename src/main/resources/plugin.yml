@@ -1,0 +1,23 @@
+name: AntiSeedCracker
+version: '3.1.0'
+main: me.legendcraft.antiseedcracker.AntiSeedCrackerPlugin
+api-version: '26.1'
+folia-supported: true
+author: SunsetRQ7_
+description: >
+  Professional world seed protection plugin for Paper, Purpur, Folia, and Spigot 26.1.2+.
+  Blocks every known seed-cracking technique: packet-level spoofing, structure
+  triangulation, Eye of Ender tracking, /locate exploitation, treasure maps,
+  End spike fingerprinting, End City fingerprinting, and plugin-API interception.
+
+commands:
+  asc:
+    aliases: [antiseedcracker]
+    description: AntiSeedCracker administration command.
+    usage: /asc <reload|status|stats|info>
+    permission: antiseedcracker.admin
+
+permissions:
+  antiseedcracker.admin:
+    description: Access to AntiSeedCracker administration commands.
+    default: op

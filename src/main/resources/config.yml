@@ -1,0 +1,52 @@
+seed_obfuscation:
+  intercept_login: true
+  intercept_respawn: true
+
+seed_rotation:
+  enabled: true
+  interval_seconds: 60
+
+structure_protection:
+
+  end_spikes:
+    enabled: true
+    worlds:
+      - world_the_end
+    modify_world: true
+
+  end_cities:
+    enabled: true
+    worlds:
+      - world_the_end
+    modify_world: true
+
+  spoof_locate_command:
+    enabled: true
+    max_offset: 2000
+
+plugin_api_protection:
+  enabled: true
+
+eye_of_ender_protection:
+  enabled: true
+  worlds:
+    - world
+  fake_stronghold_min_distance: 800
+  fake_stronghold_max_distance: 4000
+
+update_checker:
+  enabled: true
+  modrinth_id: "YOUR_MODRINTH_PROJECT_ID"
+
+database:
+  enabled: true
+  log_events: true
+  max_event_age_days: 30
+
+treasure_map_protection:
+  enabled: true
+
+extra_blocked_commands:
+  - "seedcracker"
+  - "seedfind"
+  - "worldseedinfo"

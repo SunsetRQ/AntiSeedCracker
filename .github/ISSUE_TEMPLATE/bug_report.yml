@@ -1,0 +1,64 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in AntiSeedCracker
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Fill in every field to help us reproduce and fix the issue.
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin Version
+      placeholder: "3.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: server-software
+    attributes:
+      label: Server Software & Version
+      placeholder: "Paper 26.1.2 build 58 / Folia 26.1.2 build 8"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java Version
+      placeholder: "Java 21.0.5 / Java 25.0.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Install plugin
+        2. Join the server
+        3. Run command ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Your config.yml (redact any sensitive values)
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant startup log or error output
+      render: shell
+      description: Paste the full startup section or the stacktrace, not just one line.

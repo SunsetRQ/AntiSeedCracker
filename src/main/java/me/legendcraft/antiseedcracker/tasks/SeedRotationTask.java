@@ -1,0 +1,39 @@
+package me.legendcraft.antiseedcracker.tasks;
+
+import me.legendcraft.antiseedcracker.AntiSeedCrackerPlugin;
+import me.legendcraft.antiseedcracker.scheduler.CancelableTask;
+import me.legendcraft.antiseedcracker.scheduler.FoliaSchedulerUtil;
+
+public final class SeedRotationTask implements Runnable {
+
+    private final AntiSeedCrackerPlugin plugin;
+    private volatile CancelableTask handle;
+
+    public SeedRotationTask(AntiSeedCrackerPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void start() {
+        if (handle != null) {
+            handle.cancel();
+        }
+        long periodMs = (plugin.getPluginConfig().getSeedRotationIntervalTicks() / 20L) * 1000L;
+        handle = FoliaSchedulerUtil.scheduleAsyncRepeating(plugin, this, periodMs, periodMs);
+    }
+
+    public void stop() {
+        if (handle != null) {
+            handle.cancel();
+            handle = null;
+        }
+    }
+
+    @Override
+    public void run() {
+        int count = plugin.getSeedManager().rotateAll();
+        if (count > 0) {
+            plugin.getLogger().info(
+                    "[AntiSeedCracker] Rotated fake seeds for " + count + " player(s).");
+        }
+    }
+}

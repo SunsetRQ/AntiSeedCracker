@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>AntiSeedCracker</name>
-    <description>Professional multi-layer world seed protection plugin for Paper, Purpur, Folia, and Spigot 26.1.2+</description>
+    <description>Professional multi-layer world seed protection plugin for Paper, Purpur, and Folia 26.1.2+</description>
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>

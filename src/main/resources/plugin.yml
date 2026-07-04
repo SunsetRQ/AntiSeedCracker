@@ -5,7 +5,7 @@ api-version: '26.1'
 folia-supported: true
 author: SunsetRQ7_
 description: >
-  Professional world seed protection plugin for Paper, Purpur, Folia, and Spigot 26.1.2+.
+  Professional world seed protection plugin for Paper, Purpur, and Folia 26.1.2+.
   Blocks every known seed-cracking technique: packet-level spoofing, structure
   triangulation, Eye of Ender tracking, /locate exploitation, treasure maps,
   End spike fingerprinting, End City fingerprinting, and plugin-API interception.

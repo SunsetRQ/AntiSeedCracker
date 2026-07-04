@@ -1,8 +1,13 @@
 # AntiSeedCracker
 
-**Version:** 3.1.0 &nbsp;|&nbsp; **Target:** Minecraft 26.1.2 &nbsp;|&nbsp; **Author:** SunsetRQ7_
+[![Build](https://github.com/SunsetRQ/AntiSeedCracker/actions/workflows/build.yml/badge.svg)](https://github.com/SunsetRQ/AntiSeedCracker/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/SunsetRQ/AntiSeedCracker)](https://github.com/SunsetRQ/AntiSeedCracker/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-25-orange)](https://adoptium.net/)
 
-AntiSeedCracker is a professional, multi-layer world seed protection plugin for Paper, Purpur, Folia, and Spigot. It blocks every known technique a player can use to recover your world seed, protecting your server from ESP clients and seed-cracking tools.
+**Version:** 3.2.0 &nbsp;|&nbsp; **Target:** Minecraft 26.1.2 &nbsp;|&nbsp; **Author:** SunsetRQ7_
+
+AntiSeedCracker is a professional, multi-layer world seed protection plugin for Paper, Purpur, and Folia. It blocks every known technique a player can use to recover your world seed, protecting your server from ESP clients, ghost clients, and seed-cracking tools such as SeedCrackerX.
 
 ---
 
@@ -25,20 +30,24 @@ AntiSeedCracker is a professional, multi-layer world seed protection plugin for 
 
 ## Compatibility
 
-| Platform | Supported |
-|---|---|
-| Paper 26.1.2 | ✔ |
-| Purpur 26.1.2 | ✔ |
-| Folia 26.1.2 | ✔ (region-threaded scheduling) |
-| Spigot 26.1.2 | ✔ (BukkitScheduler fallback) |
+| Platform | Supported | Verified |
+|---|---|---|
+| Paper 26.1.2 | ✔ | ✔ Live-tested on build 72, zero errors |
+| Folia 26.1.2 | ✔ (region-threaded scheduling) | ✔ Live-tested on build 8, zero errors |
+| Purpur 26.1.2 | ✔ (Paper-compatible) | — |
+| Spigot / CraftBukkit | ✘ Not supported — the plugin uses Paper-only APIs (Adventure, AsyncScheduler) | — |
 
 **Runtime:** Java 25 or higher is required.
+
+## Metrics
+
+Anonymous usage statistics are collected via [bStats](https://bstats.org/plugin/bukkit/AntiSeedCracker/32378). This can be disabled globally in `plugins/bStats/config.yml`.
 
 ---
 
 ## Installation
 
-1. Download `AntiSeedCracker-3.1.0.jar` from [Releases](../../releases/latest).
+1. Download `AntiSeedCracker-3.2.0.jar` from [Releases](../../releases/latest).
 2. Place it in your server's `plugins/` folder.
 3. Start or restart the server.
 4. Edit `plugins/AntiSeedCracker/config.yml` to your preference.
@@ -107,6 +116,10 @@ database:
 treasure_map_protection:
   enabled: true
 
+messages:
+  seed_blocked_player: "&c[AntiSeedCracker] Access to world seed information is restricted."
+  seed_blocked_console: "&c[AntiSeedCracker] Seed access is restricted. The real seed is never exposed."
+
 extra_blocked_commands:
   - "seedcracker"
   - "seedfind"
@@ -167,10 +180,19 @@ export JAVA_HOME=/path/to/jdk-25
 mvn clean package
 ```
 
-The shaded jar is produced at `target/AntiSeedCracker-3.1.0.jar`. PacketEvents is bundled and relocated to `me.legendcraft.antiseedcracker.lib.packetevents`.
+The shaded jar is produced at `target/AntiSeedCracker-3.2.0.jar`. PacketEvents 2.13.0 and bStats 3.2.1 are bundled and relocated under `me.legendcraft.antiseedcracker.lib`.
+
+---
+
+## Design Principles
+
+- **Never punish players.** AntiSeedCracker never kicks or bans anyone — it silently feeds cheat clients useless data.
+- **Never touch the real seed.** The plugin never reads, stores, transmits, or logs the actual world seed.
+- **Never corrupt the world.** All optional world modifications are single-block, physics-free, idempotent, and clearly documented.
+- **Fully asynchronous.** Packet work happens on Netty I/O threads; periodic tasks run on async schedulers; block mutations are dispatched to the owning region thread on Folia.
 
 ---
 
 ## License
 
-All rights reserved. Redistribution without permission is prohibited.
+Released under the [MIT License](LICENSE). Free to use, modify, and redistribute.

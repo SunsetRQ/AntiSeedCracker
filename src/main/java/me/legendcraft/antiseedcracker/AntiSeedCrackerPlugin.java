@@ -20,6 +20,8 @@ import me.legendcraft.antiseedcracker.tasks.SeedBroadcastTask;
 import me.legendcraft.antiseedcracker.tasks.SeedRotationTask;
 import me.legendcraft.antiseedcracker.util.PlatformUtil;
 import me.legendcraft.antiseedcracker.util.UpdateChecker;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +29,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Objects;
 
 public final class AntiSeedCrackerPlugin extends JavaPlugin {
+
+    private static final int BSTATS_PLUGIN_ID = 32378;
 
     private PluginConfig    pluginConfig;
     private SeedManager     seedManager;
@@ -107,7 +111,20 @@ public final class AntiSeedCrackerPlugin extends JavaPlugin {
             playerSessionListener.initPlayer(player);
         }
 
+        setupMetrics();
+
         getLogger().info("[AntiSeedCracker] Enabled — real seed is protected.");
+    }
+
+    private void setupMetrics() {
+        Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
+        metrics.addCustomChart(new SimplePie("platform_type", PlatformUtil::name));
+        metrics.addCustomChart(new SimplePie("plugin_api_protection_active",
+                () -> worldSeedInterceptor.isAvailable() ? "active" : "inactive"));
+        metrics.addCustomChart(new SimplePie("seed_rotation_enabled",
+                () -> pluginConfig.isSeedRotationEnabled() ? "enabled" : "disabled"));
+        metrics.addCustomChart(new SimplePie("audit_log_enabled",
+                () -> databaseManager != null ? "enabled" : "disabled"));
     }
 
     @Override
@@ -128,6 +145,22 @@ public final class AntiSeedCrackerPlugin extends JavaPlugin {
 
         reloadConfig();
         pluginConfig = new PluginConfig(getConfig());
+
+        if (pluginConfig.isDatabaseEnabled() && databaseManager == null) {
+            try {
+                databaseManager = new DatabaseManager(getDataFolder(), getLogger());
+                databaseManager.init();
+                final int maxDays = pluginConfig.getDatabaseMaxEventAgeDays();
+                FoliaSchedulerUtil.runAsync(this, () -> databaseManager.pruneOldEvents(maxDays));
+            } catch (Exception e) {
+                getLogger().warning("[AntiSeedCracker] Audit log init failed on reload: "
+                        + e.getMessage());
+                databaseManager = null;
+            }
+        } else if (!pluginConfig.isDatabaseEnabled() && databaseManager != null) {
+            databaseManager.close();
+            databaseManager = null;
+        }
 
         registerListeners();
 

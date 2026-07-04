@@ -42,6 +42,9 @@ public final class PluginConfig {
 
     private final List<String> extraBlockedCommands;
 
+    private final String messageSeedBlockedPlayer;
+    private final String messageSeedBlockedConsole;
+
     public PluginConfig(FileConfiguration cfg) {
         this.interceptLogin   = cfg.getBoolean("seed_obfuscation.intercept_login",   true);
         this.interceptRespawn = cfg.getBoolean("seed_obfuscation.intercept_respawn", true);
@@ -88,6 +91,17 @@ public final class PluginConfig {
 
         this.extraBlockedCommands = Collections.unmodifiableList(
                 cfg.getStringList("extra_blocked_commands"));
+
+        this.messageSeedBlockedPlayer = colorize(cfg.getString(
+                "messages.seed_blocked_player",
+                "&c[AntiSeedCracker] Access to world seed information is restricted."));
+        this.messageSeedBlockedConsole = colorize(cfg.getString(
+                "messages.seed_blocked_console",
+                "&c[AntiSeedCracker] Seed access is restricted. The real seed is never exposed."));
+    }
+
+    private static String colorize(String s) {
+        return s == null ? "" : s.replace('&', '§');
     }
 
     public boolean isInterceptLogin()             { return interceptLogin; }
@@ -124,4 +138,7 @@ public final class PluginConfig {
     public boolean isTreasureMapProtectionEnabled() { return treasureMapProtectionEnabled; }
 
     public List<String> getExtraBlockedCommands()   { return extraBlockedCommands; }
+
+    public String getMessageSeedBlockedPlayer()  { return messageSeedBlockedPlayer; }
+    public String getMessageSeedBlockedConsole() { return messageSeedBlockedConsole; }
 }

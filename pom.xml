@@ -6,7 +6,7 @@
 
     <groupId>me.legendcraft</groupId>
     <artifactId>AntiSeedCracker</artifactId>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
     <packaging>jar</packaging>
 
     <name>AntiSeedCracker</name>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.github.retrooper</groupId>
             <artifactId>packetevents-spigot</artifactId>
-            <version>2.12.2</version>
+            <version>2.13.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -67,6 +67,13 @@
             <version>1.20-R0.2</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.2.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -78,6 +85,7 @@
                 <version>3.13.0</version>
                 <configuration>
                     <release>25</release>
+                    <debug>false</debug>
                 </configuration>
             </plugin>
 
@@ -96,6 +104,10 @@
                         <relocation>
                             <pattern>io.github.retrooper.packetevents</pattern>
                             <shadedPattern>me.legendcraft.antiseedcracker.lib.packetevents.impl</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>me.legendcraft.antiseedcracker.lib.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                     <transformers>

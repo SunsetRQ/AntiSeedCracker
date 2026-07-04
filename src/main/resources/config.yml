@@ -46,6 +46,10 @@ database:
 treasure_map_protection:
   enabled: true
 
+messages:
+  seed_blocked_player: "&c[AntiSeedCracker] Access to world seed information is restricted."
+  seed_blocked_console: "&c[AntiSeedCracker] Seed access is restricted. The real seed is never exposed."
+
 extra_blocked_commands:
   - "seedcracker"
   - "seedfind"

@@ -24,8 +24,7 @@ public final class CommandProtectionListener implements Listener {
         if (!isSeedCommand(raw) && !isExtraBlocked(raw)) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(
-                "§c[AntiSeedCracker] Access to world seed information is restricted.");
+        event.getPlayer().sendMessage(plugin.getPluginConfig().getMessageSeedBlockedPlayer());
         plugin.getLogger().warning(
                 "[AntiSeedCracker] Seed command blocked for player "
                 + event.getPlayer().getName() + ": " + raw);
@@ -49,8 +48,7 @@ public final class CommandProtectionListener implements Listener {
         if (!isSeedCommand("/" + raw) && !isExtraBlocked("/" + raw)) return;
 
         event.setCancelled(true);
-        event.getSender().sendMessage(
-                "§c[AntiSeedCracker] Seed access is restricted. The real seed is never exposed.");
+        event.getSender().sendMessage(plugin.getPluginConfig().getMessageSeedBlockedConsole());
         plugin.getLogger().warning(
                 "[AntiSeedCracker] Console seed command blocked: " + raw);
     }
@@ -61,8 +59,7 @@ public final class CommandProtectionListener implements Listener {
         if (!isSeedCommand("/" + raw) && !isExtraBlocked("/" + raw)) return;
 
         event.setCancelled(true);
-        event.getSender().sendMessage(
-                "§c[AntiSeedCracker] Seed access is restricted. The real seed is never exposed.");
+        event.getSender().sendMessage(plugin.getPluginConfig().getMessageSeedBlockedConsole());
         plugin.getLogger().warning(
                 "[AntiSeedCracker] RCON seed command blocked: " + raw);
     }

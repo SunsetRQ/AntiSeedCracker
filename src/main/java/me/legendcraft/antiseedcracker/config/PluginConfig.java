@@ -107,7 +107,9 @@ public final class PluginConfig {
                 cfg.getBoolean("treasure_map_protection.enabled", true);
 
         this.extraBlockedCommands = Collections.unmodifiableList(
-                cfg.getStringList("extra_blocked_commands"));
+                cfg.getStringList("extra_blocked_commands").stream()
+                        .map(String::toLowerCase)
+                        .collect(java.util.stream.Collectors.toList()));
 
         this.messageSeedBlockedPlayer = colorize(cfg.getString(
                 "messages.seed_blocked_player",

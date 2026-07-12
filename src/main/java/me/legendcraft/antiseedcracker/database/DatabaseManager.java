@@ -26,6 +26,9 @@ public final class DatabaseManager {
     private Thread           writerThread;
     private volatile boolean running = false;
 
+    private BufferedWriter currentWriter;
+    private String         currentWriterDate;
+
     public DatabaseManager(File dataFolder, Logger log) {
         this.logDir = dataFolder.toPath().resolve("logs");
         this.log    = log;
@@ -116,18 +119,22 @@ public final class DatabaseManager {
     private void startWriterThread() {
         running = true;
         writerThread = new Thread(() -> {
-            while (running || !writeQueue.isEmpty()) {
-                try {
-                    Runnable task = writeQueue.take();
-                    task.run();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    Runnable remaining;
-                    while ((remaining = writeQueue.poll()) != null) {
-                        remaining.run();
+            try {
+                while (running || !writeQueue.isEmpty()) {
+                    try {
+                        Runnable task = writeQueue.take();
+                        task.run();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        Runnable remaining;
+                        while ((remaining = writeQueue.poll()) != null) {
+                            remaining.run();
+                        }
+                        break;
                     }
-                    break;
                 }
+            } finally {
+                closeCurrentWriter();
             }
         }, "ASC-AuditLog-Writer");
         writerThread.setDaemon(true);
@@ -137,20 +144,36 @@ public final class DatabaseManager {
     private void doAppend(EventType type,
                            String uuid, String name, String world, String detail,
                            long ts, String date) {
-        Path file = logDir.resolve("events-" + date + ".log");
         String line = ts                  + SEP
                 + type.name()             + SEP
                 + sanitise(uuid)          + SEP
                 + sanitise(name)          + SEP
                 + sanitise(world)         + SEP
                 + sanitise(detail);
-        try (BufferedWriter bw = Files.newBufferedWriter(
-                file, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-            bw.write(line);
-            bw.newLine();
+        try {
+            if (currentWriter == null || !date.equals(currentWriterDate)) {
+                closeCurrentWriter();
+                Path file = logDir.resolve("events-" + date + ".log");
+                currentWriter = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                currentWriterDate = date;
+            }
+            currentWriter.write(line);
+            currentWriter.newLine();
+            currentWriter.flush();
         } catch (IOException e) {
             log.warning("[ASC-Log] Write failed: " + e.getMessage());
+            closeCurrentWriter();
+        }
+    }
+
+    private void closeCurrentWriter() {
+        if (currentWriter != null) {
+            try {
+                currentWriter.close();
+            } catch (IOException ignored) { }
+            currentWriter = null;
+            currentWriterDate = null;
         }
     }
 

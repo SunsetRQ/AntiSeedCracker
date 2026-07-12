@@ -34,9 +34,9 @@ public final class AntiSeedCrackerPlugin extends JavaPlugin {
 
     private static final int BSTATS_PLUGIN_ID = 32378;
 
-    private PluginConfig    pluginConfig;
+    private volatile PluginConfig    pluginConfig;
+    private volatile DatabaseManager databaseManager;
     private SeedManager     seedManager;
-    private DatabaseManager databaseManager;
     private UpdateChecker   updateChecker;
 
     private SeedBroadcastTask seedBroadcastTask;
@@ -68,7 +68,7 @@ public final class AntiSeedCrackerPlugin extends JavaPlugin {
         saveDefaultConfig();
         pluginConfig = new PluginConfig(getConfig());
 
-        seedManager = new SeedManager(getLogger());
+        seedManager = new SeedManager();
 
         if (pluginConfig.isDatabaseEnabled()) {
             try {

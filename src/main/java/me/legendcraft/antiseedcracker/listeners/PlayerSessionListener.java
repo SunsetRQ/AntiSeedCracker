@@ -45,8 +45,10 @@ public final class PlayerSessionListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldUnload(WorldUnloadEvent event) {
-        plugin.getSeedManager().forgetWorld(event.getWorld().getUID());
         plugin.getSeedIntegrityMonitor().forgetWorld(event.getWorld().getUID());
+        if (plugin.getStructureReconMonitor() != null) {
+            plugin.getStructureReconMonitor().forgetWorld(event.getWorld().getUID());
+        }
     }
 
     public void initPlayer(Player player) {

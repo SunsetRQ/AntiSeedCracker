@@ -36,12 +36,14 @@ public final class StructureReconMonitor implements Listener {
         set.add(Structure.MONUMENT);
         set.add(Structure.IGLOO);
         set.add(Structure.END_CITY);
+        set.add(Structure.ANCIENT_CITY);
         return set;
     }
 
     private final AntiSeedCrackerPlugin plugin;
-    private final Map<UUID, Set<Long>>   visitedChunks   = new ConcurrentHashMap<>();
-    private final Map<UUID, Deque<Long>> visitTimestamps = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<Long>>          visitedChunks       = new ConcurrentHashMap<>();
+    private final Map<UUID, Deque<Long>>        visitTimestamps     = new ConcurrentHashMap<>();
+    private final Map<UUID, Map<Long, Boolean>> chunkQualifiesCache = new ConcurrentHashMap<>();
 
     public StructureReconMonitor(AntiSeedCrackerPlugin plugin) {
         this.plugin = plugin;
@@ -57,27 +59,33 @@ public final class StructureReconMonitor implements Listener {
         int toChunkZ   = event.getTo().getBlockZ() >> 4;
         if (fromChunkX == toChunkX && fromChunkZ == toChunkZ) return;
 
-        Chunk chunk = event.getTo().getChunk();
-        Collection<GeneratedStructure> structures;
-        try {
-            structures = chunk.getStructures();
-        } catch (Exception e) {
-            return;
-        }
-        if (structures.isEmpty()) return;
+        UUID worldUid = event.getTo().getWorld().getUID();
+        long chunkKey = (((long) toChunkX) << 32) ^ (toChunkZ & 0xFFFFFFFFL);
 
-        boolean qualifies = false;
-        for (GeneratedStructure s : structures) {
-            if (TRACKED_STRUCTURES.contains(s.getStructure())) {
-                qualifies = true;
-                break;
+        Map<Long, Boolean> worldCache = chunkQualifiesCache.computeIfAbsent(
+                worldUid, k -> new ConcurrentHashMap<>());
+        Boolean qualifies = worldCache.get(chunkKey);
+        if (qualifies == null) {
+            Chunk chunk = event.getTo().getChunk();
+            Collection<GeneratedStructure> structures;
+            try {
+                structures = chunk.getStructures();
+            } catch (Exception e) {
+                return;
             }
+            qualifies = false;
+            for (GeneratedStructure s : structures) {
+                if (TRACKED_STRUCTURES.contains(s.getStructure())) {
+                    qualifies = true;
+                    break;
+                }
+            }
+            worldCache.put(chunkKey, qualifies);
         }
         if (!qualifies) return;
 
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        long chunkKey = (((long) toChunkX) << 32) ^ (toChunkZ & 0xFFFFFFFFL);
 
         Set<Long> visited = visitedChunks.computeIfAbsent(uuid, k -> ConcurrentHashMap.newKeySet());
         if (!visited.add(chunkKey)) return;
@@ -119,6 +127,10 @@ public final class StructureReconMonitor implements Listener {
     public void removePlayer(UUID uuid) {
         visitedChunks.remove(uuid);
         visitTimestamps.remove(uuid);
+    }
+
+    public void forgetWorld(UUID worldUid) {
+        chunkQualifiesCache.remove(worldUid);
     }
 
     public void unregister() {

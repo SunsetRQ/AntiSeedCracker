@@ -1,46 +1,58 @@
 # AntiSeedCracker
 
-**Stop seed crackers. Silently. Permanently.**
+[![Build](https://github.com/SunsetRQ7/AntiSeedCracker/actions/workflows/build.yml/badge.svg)](https://github.com/SunsetRQ7/AntiSeedCracker/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/SunsetRQ7/AntiSeedCracker)](https://github.com/SunsetRQ7/AntiSeedCracker/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/SunsetRQ7/AntiSeedCracker/blob/main/LICENSE)
+[![Java](https://img.shields.io/badge/Java-25-orange)](https://adoptium.net/)
 
-AntiSeedCracker is a professional, multi-layer world seed protection plugin for **Paper**, **Purpur**, and **Folia**. It defeats every known technique that cheat clients, ghost clients, and tools like SeedCrackerX use to recover your world seed — without ever kicking, banning, or even alerting the player. Cheaters simply receive cryptographically random garbage and never know why their cracker fails.
+### Stop seed crackers. Silently. Permanently.
+
+Your world seed is the master key to your entire map. Whoever recovers it can compute — instantly, from outside the game, with zero in-game effort — the exact location of every stronghold, ancient city, buried treasure, ore vein, and slime chunk on your server. **That's not a minor leak. That's wallhack-grade ESP for your whole world.**
+
+AntiSeedCracker shuts every known door a cheat client, ghost client, or tool like SeedCrackerX can use to get it. **14 protection layers. Zero kicks. Zero bans.** Cheaters just quietly receive cryptographically random garbage and never find out why their cracker keeps failing.
 
 ---
 
 ## Why protect your seed?
 
-Once a player knows your world seed, they can compute the exact location of every stronghold, ancient city, buried treasure, ore vein, and slime chunk on your server — from an external tool, with no in-game effort. Seed knowledge is wallhack-grade ESP for the entire map. AntiSeedCracker closes every leak.
+Once your seed is out, it doesn't matter how good your build-battle event or your economy plugin is — every hidden structure on the map is public information to anyone with a laptop. Seed-cracking tools don't need to hack your server or read your files: they reconstruct the seed purely from structure coordinates a player legitimately walked to. AntiSeedCracker can't make that impossible (nothing can — see **Honest limits** below), but it closes off every *other* way to leak it, and gives you visibility into the one it can't.
 
 ## Protection layers
 
-- **Packet-level seed spoofing** — replaces the hashed seed in JOIN_GAME and RESPAWN packets with a per-player, cryptographically random fake before it ever leaves the server (Netty-level via bundled PacketEvents).
+**Network-level**
+- **Packet-level seed spoofing** — replaces the hashed seed in `JOIN_GAME` and `RESPAWN` packets with a per-player, cryptographically random fake before it ever leaves the server (Netty-level, via bundled PacketEvents).
 - **Dynamic seed rotation** — every player's fake seed rotates on a configurable interval, defeating crackers that accumulate data across sessions.
-- **Seed integrity monitor** — read-only watchdog that verifies the real generation seed never drifts. AntiSeedCracker does not, and will not, write to your world's actual generation seed — see "Safe for your world" below.
-- **Eye of Ender redirection** — thrown Eyes fly toward a per-player fake stronghold with randomized angular jitter, making triangulation useless.
-- **/locate spoofing** — returns convincing fake coordinates; stronghold queries stay consistent with Eye of Ender behavior.
-- **Seed command blocking** — /seed and friends are blocked for players, console, RCON, and stripped from tab-complete.
+- **Seed integrity monitor** — read-only watchdog confirming the real generation seed never drifts. AntiSeedCracker does not, and will not, write to your world's actual generation seed — see **Safe for your world** below.
+
+**World & structure**
+- **Eye of Ender redirection** — thrown Eyes are redirected to a per-player fake stronghold for their entire flight path, with angular jitter, making triangulation useless.
+- **`/locate` spoofing** — returns convincing fake coordinates, stable per player and per structure so repeat queries can't be used to spot the fake.
 - **End spike randomization** — shuffles the bedrock cap heights of the ten End pillars, destroying the vanilla height fingerprint that uniquely identifies a seed.
 - **End City fingerprint removal** — replaces the distinctive magenta glass pattern in End Cities (scoped to the structure's bounding box, not the whole chunk).
-- **Treasure & explorer map scrambling** — structure icons on maps are randomized in the MAP_DATA packet.
-- **Structure reconnaissance monitor** — logs (never blocks) suspicious multi-structure visitation patterns matching known seed-cracking tool behavior; tracked structure list is fully configurable.
-- **Command probing monitor** — logs (never blocks) a player racking up several blocked seed commands in a short window, a pattern consistent with bypass-probing scripts.
-- **`/execute`-wrapping protection** — every blocked command is also checked against what an `/execute ... run ...` chain ultimately dispatches to, closing a well-known Bukkit command-blocker gap.
-- **Slime chunk obfuscation** (opt-in) — denies slime-chunk-sampling-based cracking at the cost of disabling slime farms where enabled.
-- **Audit log** — every blocked attempt is recorded to a lightweight flat-file log, with /asc stats summaries in-game.
+- **Treasure & explorer map scrambling** — structure icons on maps are randomized in the `MAP_DATA` packet, stable per map so icons don't visibly jitter around.
+- **Slime chunk obfuscation** *(opt-in)* — denies slime-chunk-sampling-based cracking at the cost of disabling slime farms where enabled.
+
+**Command & detection** *(all logging-only where noted — never punishes players)*
+- **Seed command blocking** — `/seed` and friends are blocked for players, console, and RCON, and stripped from tab-complete.
+- **`/execute`-wrapping protection** — every blocked command is also checked against what an `/execute ... run ...` chain ultimately dispatches to (recursively, for nested chains), closing a well-known Bukkit command-blocker gap.
+- **Structure reconnaissance monitor** — logs suspicious multi-structure visitation patterns matching known seed-cracking tool behavior; the tracked structure list is fully configurable.
+- **Command probing monitor** — logs a player racking up several blocked seed commands in a short window, a pattern consistent with a bypass-probing script rather than one curious `/seed`.
+- **Audit log** — every blocked attempt is recorded to a lightweight flat-file log, with `/asc stats` summaries in-game.
 
 ## Never punishes players
 
-AntiSeedCracker follows a strict no-punishment philosophy: no kicks, no bans. Cheat tools silently fail while legitimate gameplay is completely unaffected.
+AntiSeedCracker follows a strict no-punishment philosophy: no kicks, no bans, ever. Cheat tools silently fail while legitimate gameplay is completely unaffected — nobody gets caught in the crossfire.
 
 ## Safe for your world
 
 - The real seed is never read into logs, files, or network traffic, and is never rewritten by this plugin.
 - An earlier internal design continuously overwrote the live in-memory generation seed to spoof `World.getSeed()` for other plugins. That approach was removed in 3.3.0 after we found it could corrupt chunk decoration on affected servers — Minecraft re-reads that field fresh for every chunk it generates, not just once at world load. The plugin now only ever reads that value, never writes it.
 - Optional cosmetic changes (End spike caps, End City glass) are single-block, physics-free, run at most once per chunk, and can be disabled in the config.
-- Verified by live testing on Paper 26.1.2 and Folia 26.1.2: zero errors, and the real seed confirmed byte-for-byte intact on disk after extended runtime.
+- Verified by live testing on real Paper 26.1.2 and Folia 26.1.2 servers: zero errors, real seed confirmed byte-for-byte intact on disk after extended runtime.
 
 ## Honest limits
 
-No plugin can make a seed truly uncrackable against tools like SeedCrackerX, which reconstruct it from the real coordinates of structures a player has legitimately explored — that's not a network exploit, and coordinates can't be hidden from a player standing at their own position. AntiSeedCracker closes every server-side leak we're aware of (packet spoofing, triangulation, command access, structure fingerprinting) and adds detection for cracking-pattern behavior, but exploration-based cracking is a limit of the genre, not something this plugin claims to solve.
+No plugin can make a seed truly uncrackable against tools like SeedCrackerX, which reconstruct it from the real coordinates of structures a player has legitimately explored — that's not a network exploit, and coordinates can't be hidden from a player standing at their own position. AntiSeedCracker closes every server-side leak we're aware of (packet spoofing, triangulation, command access, structure fingerprinting) and adds detection for cracking-pattern behavior, but exploration-based cracking is a limit of the genre, not something this plugin claims to solve. If a listing promises "100% uncrackable," be skeptical of it — not of us for saying so.
 
 ## Performance
 
@@ -59,9 +71,9 @@ Spigot/CraftBukkit and legacy Minecraft versions (1.16.5 – 25.x) are not suppo
 
 ## Quick start
 
-1. Drop `AntiSeedCracker-3.5.0.jar` into your `plugins/` folder.
+1. Drop `AntiSeedCracker-3.5.0.1.jar` into your `plugins/` folder.
 2. Restart the server. Protection is active immediately with sensible defaults.
-3. Optionally tune `plugins/AntiSeedCracker/config.yml` (every layer, world list, message, and interval is configurable) and apply with `/asc reload`.
+3. Optionally tune `plugins/AntiSeedCracker/config.yml` — every layer, world list, message, and interval is configurable — and apply with `/asc reload`, or flip a single feature live with `/asc toggle`.
 
 ## Commands
 
@@ -76,5 +88,5 @@ Permissions: `antiseedcracker.admin` (umbrella, default: op), or split as `antis
 
 ---
 
-**Open source** under the MIT License: https://github.com/SunsetRQ/AntiSeedCracker
+**Open source** under the MIT License: https://github.com/SunsetRQ7/AntiSeedCracker
 Issues and feature requests welcome on GitHub. Anonymous usage metrics via bStats (opt-out supported).

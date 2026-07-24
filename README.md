@@ -1,7 +1,7 @@
 # AntiSeedCracker
 
-[![Build](https://github.com/SunsetRQ/AntiSeedCracker/actions/workflows/build.yml/badge.svg)](https://github.com/SunsetRQ/AntiSeedCracker/actions/workflows/build.yml)
-[![Release](https://img.shields.io/github/v/release/SunsetRQ/AntiSeedCracker)](https://github.com/SunsetRQ/AntiSeedCracker/releases/latest)
+[![Build](https://github.com/SunsetRQ7/AntiSeedCracker/actions/workflows/build.yml/badge.svg)](https://github.com/SunsetRQ7/AntiSeedCracker/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/SunsetRQ/AntiSeedCracker)](https://github.com/SunsetRQ7/AntiSeedCracker/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-25-orange)](https://adoptium.net/)
 

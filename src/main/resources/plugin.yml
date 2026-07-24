@@ -1,5 +1,5 @@
 name: AntiSeedCracker
-version: '3.5.0.1'
+version: '3.5.0.2'
 main: me.sunsetrqsv.antiseedcracker.AntiSeedCrackerPlugin
 api-version: '26.1'
 folia-supported: true

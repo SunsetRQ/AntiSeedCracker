@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-25-orange)](https://adoptium.net/)
 
-**Version:** 3.5.0.1 &nbsp;|&nbsp; **Target:** Minecraft 26.1.2 &nbsp;|&nbsp; **Author:** SunsetRQ7_
+**Version:** 3.5.0.2 &nbsp;|&nbsp; **Target:** Minecraft 26.1.2 &nbsp;|&nbsp; **Author:** SunsetRQ7_
 
 AntiSeedCracker is a professional, multi-layer world seed protection plugin for Paper, Purpur, and Folia. It blocks every known technique a player can use to recover your world seed, protecting your server from ESP clients, ghost clients, and seed-cracking tools such as SeedCrackerX.
 
@@ -51,7 +51,7 @@ Anonymous usage statistics are collected via [bStats](https://bstats.org/plugin/
 
 ## Installation
 
-1. Download `AntiSeedCracker-3.5.0.1.jar` from [Releases](../../releases/latest).
+1. Download `AntiSeedCracker-3.5.0.2.jar` from [Releases](../../releases/latest).
 2. Place it in your server's `plugins/` folder.
 3. Start or restart the server.
 4. Edit `plugins/AntiSeedCracker/config.yml` to your preference.
@@ -237,7 +237,7 @@ export JAVA_HOME=/path/to/jdk-25
 mvn clean package
 ```
 
-The shaded jar is produced at `target/AntiSeedCracker-3.5.0.1.jar`. PacketEvents 2.13.0 and bStats 3.2.1 are bundled and relocated under `me.sunsetrqsv.antiseedcracker.lib`.
+The shaded jar is produced at `target/AntiSeedCracker-3.5.0.2.jar`. PacketEvents 2.13.0 and bStats 3.2.1 are bundled and relocated under `me.sunsetrqsv.antiseedcracker.lib`.
 
 ---
 

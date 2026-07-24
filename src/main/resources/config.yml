@@ -35,11 +35,6 @@ structure_recon_monitor:
   enabled: true
   threshold: 6
   window_seconds: 900
-  # Leave empty to use the built-in default list (shipwrecks, desert/jungle temples,
-  # swamp huts, pillager outposts, ocean monuments, igloos, buried treasure, End
-  # Cities, ancient cities — the structures SeedCrackerX-style tools accumulate bits
-  # from). Deliberately excludes villages/mineshafts/ruined portals since those are
-  # far too common to be a useful signal and would just generate noise.
   tracked_structures: []
 
 eye_of_ender_protection:
@@ -70,11 +65,6 @@ extra_blocked_commands:
   - "seedfind"
   - "worldseedinfo"
 
-# Logs (never blocks — same non-punishing philosophy as structure_recon_monitor) when
-# a player triggers several blocked /seed-family commands in a short window: a pattern
-# consistent with a script or macro probing for a command-blocker bypass (trying many
-# command variants back to back) rather than a player who just typed /seed once out of
-# curiosity.
 command_probing_monitor:
   enabled: true
   threshold: 5

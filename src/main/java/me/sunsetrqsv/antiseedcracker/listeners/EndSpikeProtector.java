@@ -20,6 +20,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class EndSpikeProtector implements Listener {
 
@@ -31,7 +34,7 @@ public final class EndSpikeProtector implements Listener {
     static {
         PILLAR_ANGLES = new double[10];
         for (int i = 0; i < 10; i++) {
-            PILLAR_ANGLES[i] = 2.0 * (-Math.PI + Math.PI * 0.1 * i);
+            PILLAR_ANGLES[i] = i * (2.0 * Math.PI / 10.0);
         }
     }
 
@@ -39,6 +42,10 @@ public final class EndSpikeProtector implements Listener {
 
     private final AntiSeedCrackerPlugin plugin;
     private final NamespacedKey modifiedKey;
+
+    /** Worlds currently running a respawn-cycle poll loop, to avoid starting one per crystal
+     *  (all 4 respawn crystals fire {@link EntityPlaceEvent} independently). */
+    private final Set<UUID> pollingWorlds = ConcurrentHashMap.newKeySet();
 
     public EndSpikeProtector(AntiSeedCrackerPlugin plugin) {
         this.plugin      = plugin;
@@ -62,10 +69,15 @@ public final class EndSpikeProtector implements Listener {
         if (event.getEntityType() != EntityType.END_CRYSTAL) return;
         World world = event.getEntity().getWorld();
         if (!shouldProcess(world)) return;
+        if (!plugin.getPluginConfig().isEndSpikesModifyWorld()) return;
 
         Block placedOn = event.getBlock();
         if (placedOn == null || placedOn.getType() != Material.BEDROCK) return;
         if (Math.abs(placedOn.getX()) > 3 || Math.abs(placedOn.getZ()) > 3) return;
+
+        // All 4 respawn crystals fire this event independently within the same tick or two;
+        // without this guard each one would start its own redundant 300-attempt poll loop.
+        if (!pollingWorlds.add(world.getUID())) return;
 
         world.getPersistentDataContainer().set(modifiedKey, PersistentDataType.BOOLEAN, false);
         schedulePollForRespawnEnd(world, 0);
@@ -78,12 +90,15 @@ public final class EndSpikeProtector implements Listener {
     }
 
     private void scheduleModification(World world) {
+        // Checked before touching the PDC at all: if this flag were set while modify_world
+        // was off, turning modify_world on later would find "already modified" already true
+        // and permanently skip the shuffle for this world.
+        if (!plugin.getPluginConfig().isEndSpikesModifyWorld()) return;
+
         Boolean alreadyModified = world.getPersistentDataContainer()
                 .getOrDefault(modifiedKey, PersistentDataType.BOOLEAN, false);
         if (alreadyModified) return;
         world.getPersistentDataContainer().set(modifiedKey, PersistentDataType.BOOLEAN, true);
-
-        if (!plugin.getPluginConfig().isEndSpikesModifyWorld()) return;
 
         int[] heights = Arrays.copyOf(VANILLA_HEIGHTS, VANILLA_HEIGHTS.length);
         for (int i = heights.length - 1; i > 0; i--) {
@@ -121,6 +136,7 @@ public final class EndSpikeProtector implements Listener {
 
     private void schedulePollForRespawnEnd(World world, int attemptCount) {
         if (attemptCount > 300) {
+            pollingWorlds.remove(world.getUID());
             scheduleModification(world);
             return;
         }
@@ -133,6 +149,7 @@ public final class EndSpikeProtector implements Listener {
             if (summoning) {
                 schedulePollForRespawnEnd(world, attemptCount + 1);
             } else {
+                pollingWorlds.remove(world.getUID());
                 scheduleModification(world);
             }
         }, 20L);

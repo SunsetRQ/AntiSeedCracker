@@ -29,7 +29,7 @@ Once your seed is out, it doesn't matter how good your build-battle event or you
 - **`/locate` spoofing** — returns convincing fake coordinates, stable per player and per structure so repeat queries can't be used to spot the fake.
 - **End spike randomization** — shuffles the bedrock cap heights of the ten End pillars, destroying the vanilla height fingerprint that uniquely identifies a seed.
 - **End City fingerprint removal** — replaces the distinctive magenta glass pattern in End Cities (scoped to the structure's bounding box, not the whole chunk).
-- **Treasure & explorer map scrambling** — structure icons on maps are randomized in the `MAP_DATA` packet, stable per map so icons don't visibly jitter around.
+- **Treasure & explorer map scrambling** — buried treasure, mansion, monument, and other structure icons on maps are randomized in the `MAP_DATA` packet, stable per map so icons don't visibly jitter around.
 - **Slime chunk obfuscation** *(opt-in)* — denies slime-chunk-sampling-based cracking at the cost of disabling slime farms where enabled.
 
 **Command & detection** *(all logging-only where noted — never punishes players)*
@@ -71,7 +71,7 @@ Spigot/CraftBukkit and legacy Minecraft versions (1.16.5 – 25.x) are not suppo
 
 ## Quick start
 
-1. Drop `AntiSeedCracker-3.5.0.1.jar` into your `plugins/` folder.
+1. Drop `AntiSeedCracker-3.5.0.2.jar` into your `plugins/` folder.
 2. Restart the server. Protection is active immediately with sensible defaults.
 3. Optionally tune `plugins/AntiSeedCracker/config.yml` — every layer, world list, message, and interval is configurable — and apply with `/asc reload`, or flip a single feature live with `/asc toggle`.
 

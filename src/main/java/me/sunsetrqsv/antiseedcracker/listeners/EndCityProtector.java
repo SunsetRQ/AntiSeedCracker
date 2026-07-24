@@ -49,16 +49,25 @@ public final class EndCityProtector implements Listener {
                 Collection<GeneratedStructure> structures =
                         chunk.getStructures(Structure.END_CITY);
 
-                if (structures.isEmpty()) return;
+                if (structures.isEmpty()) {
+                    // Nothing in this chunk ever needs checking again - structures don't
+                    // appear after generation, so this is permanently safe to skip.
+                    chunk.getPersistentDataContainer()
+                            .set(modifiedKey, PersistentDataType.BYTE, (byte) 1);
+                    return;
+                }
 
                 if (plugin.getPluginConfig().isEndCitiesModifyWorld()) {
                     for (GeneratedStructure structure : structures) {
                         replaceGlassInBounds(chunk, structure.getBoundingBox());
                     }
+                    chunk.getPersistentDataContainer()
+                            .set(modifiedKey, PersistentDataType.BYTE, (byte) 1);
                 }
-
-                chunk.getPersistentDataContainer()
-                        .set(modifiedKey, PersistentDataType.BYTE, (byte) 1);
+                // else: an End City is here but modify_world is off - leave unmarked so a
+                // future load re-checks this chunk in case modify_world gets enabled later.
+                // Marking it "done" here without having done anything would permanently
+                // skip this chunk even after the admin turns modify_world on.
 
             } catch (Exception e) {
                 plugin.getLogger().warning("[AntiSeedCracker] EndCityProtector scan error"

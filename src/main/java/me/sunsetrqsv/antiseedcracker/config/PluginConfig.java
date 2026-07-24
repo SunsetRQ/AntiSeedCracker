@@ -25,7 +25,7 @@ public final class PluginConfig {
     private final boolean interceptRespawn;
 
     private final boolean seedRotationEnabled;
-    private final long    seedRotationIntervalTicks;
+    private final long    seedRotationIntervalSeconds;
 
     private final boolean      endSpikesEnabled;
     private final List<String> endSpikeWorlds;
@@ -76,8 +76,8 @@ public final class PluginConfig {
         this.interceptRespawn = cfg.getBoolean("seed_obfuscation.intercept_respawn", true);
 
         this.seedRotationEnabled = cfg.getBoolean("seed_rotation.enabled", true);
-        long rawSecs = Math.max(30L, cfg.getLong("seed_rotation.interval_seconds", 60L));
-        this.seedRotationIntervalTicks = rawSecs * 20L;
+        this.seedRotationIntervalSeconds = Math.max(30L,
+                cfg.getLong("seed_rotation.interval_seconds", 60L));
 
         this.endSpikesEnabled     = cfg.getBoolean("structure_protection.end_spikes.enabled",      true);
         this.endSpikeWorlds       = Collections.unmodifiableList(
@@ -154,8 +154,8 @@ public final class PluginConfig {
     public boolean isInterceptLogin()             { return interceptLogin; }
     public boolean isInterceptRespawn()           { return interceptRespawn; }
 
-    public boolean isSeedRotationEnabled()        { return seedRotationEnabled; }
-    public long    getSeedRotationIntervalTicks() { return seedRotationIntervalTicks; }
+    public boolean isSeedRotationEnabled()          { return seedRotationEnabled; }
+    public long    getSeedRotationIntervalSeconds() { return seedRotationIntervalSeconds; }
 
     public boolean      isEndSpikesEnabled()     { return endSpikesEnabled; }
     public List<String> getEndSpikeWorlds()      { return endSpikeWorlds; }

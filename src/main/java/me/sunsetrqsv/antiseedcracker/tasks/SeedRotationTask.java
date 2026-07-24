@@ -17,7 +17,7 @@ public final class SeedRotationTask implements Runnable {
         if (handle != null) {
             handle.cancel();
         }
-        long periodMs = (plugin.getPluginConfig().getSeedRotationIntervalTicks() / 20L) * 1000L;
+        long periodMs = plugin.getPluginConfig().getSeedRotationIntervalSeconds() * 1000L;
         handle = FoliaSchedulerUtil.scheduleAsyncRepeating(plugin, this, periodMs, periodMs);
     }
 

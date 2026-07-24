@@ -1,3 +1,13 @@
+## 3.5.0.2 — 2026-07-24
+
+**Fixed**
+- Fixed buried treasure map locations never actually being scrambled: the treasure map protection layer was filtering map icons by the wrong internal name, so a real buried treasure map still pointed straight at the true, unmodified location. It now correctly detects and scrambles the treasure marker.
+- Fixed `end_cities`/`end_spikes` protection being able to permanently disable itself: if `modify_world` was left off for a world or chunk, turning it on later (including via `/asc toggle`) would silently do nothing for anything already loaded once while it was off. It now correctly applies the moment it's turned on.
+- Fixed the End obsidian pillar protection starting up to four times more background work than needed during a dragon respawn.
+- General code cleanup and minor performance tightening (task scheduling, config parsing) with no behavior changes.
+
+---
+
 ## 3.5.0.1 — 2026-07-22
 
 **Fixed**

@@ -3,6 +3,43 @@
 All notable changes to AntiSeedCracker are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [3.5.0.2] - 2026-07-24
+
+### Fixed
+- **Buried treasure map locations were never actually scrambled**: `MapSeedInterceptor`
+  filtered map decorations by name, checking for `"TREASURE"`, `"PILLAGER"`, and
+  `"BASTION"` — none of which are real vanilla map decoration type IDs (verified against
+  `org.bukkit.map.MapCursor.Type` directly: no such constants exist, so those three checks
+  never matched anything, ever). Buried treasure maps actually use `TARGET_X`, which was
+  missing entirely. Buried treasure is one of this plugin's own named SeedCrackerX
+  structure signals, so its map marker was leaking the real, unscrambled location on every
+  treasure map handed to a player. Now correctly matches `TARGET_X`; the two other
+  never-matching checks were removed.
+- **`end_cities`/`end_spikes` `modify_world: false` could permanently disable itself**:
+  both `EndCityProtector` and `EndSpikeProtector` marked a chunk/world as "already
+  processed" as soon as it was scanned, even when `modify_world` was off and nothing was
+  actually changed. Turning `modify_world` on later via `/asc toggle` or a config edit
+  would find that flag already set and skip the modification forever, for any chunk/world
+  already loaded once while it was off. Both now only mark a chunk/world "done" when the
+  modification actually ran (or, for End Cities, when a chunk provably has no End City at
+  all and therefore never will need modifying).
+- **Redundant respawn-cycle polling in `EndSpikeProtector`**: all four dragon-respawn End
+  Crystals fire their placement event independently, each previously starting its own
+  300-attempt polling loop to detect when the respawn animation finished — four times the
+  necessary scheduled work per dragon fight. Now guarded so only one poll loop runs per
+  world at a time.
+- Replaced reflection-based scheduled-task cancellation (`getMethod("cancel").invoke(...)`,
+  silently swallowing any failure) in `FoliaSchedulerUtil` with direct, typed
+  `ScheduledTask#cancel()` calls — verified against the real Paper API class. Faster, and
+  a genuine cancellation failure is no longer silently discarded.
+- Removed a pointless seconds→ticks→seconds round-trip conversion in the seed rotation
+  interval config.
+- Simplified the End Spike pillar-angle formula to a plain decagon spacing expression;
+  behaviorally identical (verified via the periodicity of `cos`/`sin`), just no longer
+  needlessly obscure.
+- Trimmed default `config.yml` down to essential settings, with fuller explanations kept
+  in the README instead of long inline comments.
+
 ## [3.5.0.1] - 2026-07-22
 
 ### Fixed

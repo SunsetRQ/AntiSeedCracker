@@ -1,5 +1,6 @@
 package me.sunsetrqsv.antiseedcracker.scheduler;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.sunsetrqsv.antiseedcracker.util.PlatformUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,13 +16,9 @@ public final class FoliaSchedulerUtil {
     public static CancelableTask scheduleAsyncRepeating(Plugin plugin, Runnable task,
                                                          long initialDelayMs, long periodMs) {
         if (PlatformUtil.IS_PAPER) {
-            Object handle = plugin.getServer().getAsyncScheduler()
+            ScheduledTask handle = plugin.getServer().getAsyncScheduler()
                     .runAtFixedRate(plugin, t -> task.run(), initialDelayMs, periodMs, TimeUnit.MILLISECONDS);
-            return () -> {
-                try {
-                    handle.getClass().getMethod("cancel").invoke(handle);
-                } catch (Exception ignored) {}
-            };
+            return handle::cancel;
         }
         long delayTicks  = Math.max(1L, initialDelayMs / 50L);
         long periodTicks = Math.max(1L, periodMs / 50L);
@@ -113,13 +110,9 @@ public final class FoliaSchedulerUtil {
                                                           long initialDelayTicks,
                                                           long periodTicks) {
         if (PlatformUtil.IS_PAPER) {
-            Object handle = plugin.getServer().getGlobalRegionScheduler()
+            ScheduledTask handle = plugin.getServer().getGlobalRegionScheduler()
                     .runAtFixedRate(plugin, t -> task.run(), initialDelayTicks, periodTicks);
-            return () -> {
-                try {
-                    handle.getClass().getMethod("cancel").invoke(handle);
-                } catch (Exception ignored) {}
-            };
+            return handle::cancel;
         }
         org.bukkit.scheduler.BukkitTask bt = plugin.getServer().getScheduler()
                 .runTaskTimer(plugin, task, initialDelayTicks, periodTicks);

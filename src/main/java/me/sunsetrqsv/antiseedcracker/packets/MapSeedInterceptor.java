@@ -68,17 +68,22 @@ public final class MapSeedInterceptor extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * Matches against the real vanilla map decoration type IDs (verified against
+     * {@code org.bukkit.map.MapCursor.Type}: no "treasure", "pillager", or "bastion" type
+     * exists at all — those three never matched anything. Buried treasure maps actually use
+     * {@code TARGET_X}, which was previously missing here, so buried treasure locations
+     * (one of this plugin's own named SeedCrackerX signals) were never actually scrambled.
+     */
     private static boolean isStructureDecoration(MapDecorationType type) {
         try {
             String name = type.getName().toString().toUpperCase();
             return name.contains("MANSION")
                     || name.contains("MONUMENT")
+                    || name.contains("TARGET_X")
                     || name.contains("RED_X")
-                    || name.contains("TREASURE")
                     || name.contains("TRIAL_CHAMBERS")
                     || name.contains("VILLAGE")
-                    || name.contains("PILLAGER")
-                    || name.contains("BASTION")
                     || name.contains("JUNGLE_TEMPLE")
                     || name.contains("SWAMP_HUT");
         } catch (Exception ignored) {
